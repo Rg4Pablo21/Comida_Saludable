@@ -1,0 +1,244 @@
+:root {
+    --color-primary: #4CAF50;
+    --color-secondary: #FF9800;
+    --color-danger: #F44336;
+    --color-text: #333;
+    --color-light: #f8f8f8;
+    --color-dark: #2E7D32;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #E8F5E9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: var(--color-text);
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .background-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+    z-index: -1;
+  }
+  
+  #game-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    width: 95%;
+    max-width: 600px;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid var(--color-primary);
+  }
+  
+  #header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  
+  #vidas {
+    font-size: 1.5rem;
+    color: var(--color-danger);
+  }
+  
+  #puntos {
+    font-weight: 600;
+    color: var(--color-dark);
+  }
+  
+  #puntos span {
+    color: var(--color-primary);
+  }
+  
+  h1 {
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+    font-size: 2rem;
+  }
+  
+  #progress-container {
+    width: 100%;
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+  
+  #progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: var(--color-primary);
+    transition: var(--transition);
+  }
+  
+  #nivel-info {
+    font-size: 1.1rem;
+    color: var(--color-dark);
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  
+  #pregunta {
+    font-size: 1.3rem;
+    margin: 1.5rem 0;
+    font-weight: 600;
+  }
+  
+  #opciones {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  
+  .opcion {
+    cursor: pointer;
+    padding: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    transition: var(--transition);
+    font-size: 1.1rem;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .opcion:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  #feedback {
+    margin: 1.5rem 0;
+    min-height: 80px;
+  }
+  
+  #feedback-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  #explicacion {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  #timer-container {
+    width: 100%;
+    height: 8px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+  
+  #timer-bar {
+    height: 100%;
+    width: 100%;
+    background-color: var(--color-secondary);
+    transition: width 0.1s linear;
+  }
+  
+  .btn {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+    margin-top: 1rem;
+    box-shadow: var(--shadow);
+  }
+  
+  .btn:hover {
+    background-color: var(--color-dark);
+    transform: translateY(-2px);
+  }
+  
+  .btn:active {
+    transform: translateY(0);
+  }
+  
+  #game-over {
+    padding: 2rem;
+  }
+  
+  #game-over h2 {
+    color: var(--color-primary);
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+  }
+  
+  #final-score, #record {
+    font-size: 1.3rem;
+    margin: 1rem 0;
+    font-weight: 600;
+  }
+  
+  #final-score span, #record span {
+    color: var(--color-primary);
+  }
+  
+  /* Efectos para respuestas */
+  .correcta {
+    background-color: #E8F5E9 !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary);
+    animation: pulse 0.5s;
+  }
+  
+  .incorrecta {
+    background-color: #FFEBEE !important;
+    border-color: var(--color-danger) !important;
+    color: var(--color-danger);
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  /* Responsive */
+  @media (max-width: 600px) {
+    #game-container {
+      padding: 1.5rem;
+      width: 100%;
+      border-radius: 0;
+      min-height: 100vh;
+    }
+    
+    #opciones {
+      grid-template-columns: 1fr;
+    }
+    
+    h1 {
+      font-size: 1.8rem;
+    }
+  }

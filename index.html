@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🍎 Elige lo Saludable</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+  <div class="background-animation"></div>
+  <div id="game-container">
+    <div id="header">
+      <div id="vidas">❤️❤️❤️</div>
+      <div id="puntos">Puntos: <span>0</span></div>
+    </div>
+    
+    <div id="game-content">
+      <h1>🍏 Elige lo Saludable</h1>
+      <div id="progress-container">
+        <div id="progress-bar"></div>
+      </div>
+      <div id="nivel-info">Nivel <span id="nivel">1</span> de 15</div>
+      <div id="pregunta">¿Cuál alimento es más saludable?</div>
+      <div id="opciones" class="grid-options"></div>
+      <div id="feedback">
+        <div id="feedback-text"></div>
+        <div id="explicacion"></div>
+      </div>
+      <div id="timer-container">
+        <div id="timer-bar"></div>
+      </div>
+      <button id="siguiente" class="btn">Siguiente</button>
+    </div>
+    
+    <div id="game-over" style="display: none;">
+      <h2>¡Juego Terminado!</h2>
+      <div id="final-score">Puntuación final: <span>0</span></div>
+      <div id="record">Récord: <span>0</span></div>
+      <button id="reiniciar" class="btn">Jugar de nuevo</button>
+    </div>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
