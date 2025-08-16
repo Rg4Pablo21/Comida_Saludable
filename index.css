@@ -39,6 +39,56 @@ body {
   z-index: -1;
 }
 
+/* ===== Registro ===== */
+.registro {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  width: 95%;
+  max-width: 520px;
+  border: 2px solid var(--color-primary);
+}
+
+.registro h1 {
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+}
+
+.registro-desc {
+  margin-bottom: 1rem;
+  color: #4d4d4d;
+}
+
+.registro-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+#nombre-jugador {
+  padding: 0.8rem 1rem;
+  border: 2px solid #c8e6c9;
+  border-radius: 12px;
+  outline: none;
+  font-size: 1rem;
+}
+
+#nombre-jugador:focus {
+  border-color: var(--color-primary);
+}
+
+.registro-msg {
+  display: block;
+  margin-top: 0.6rem;
+  color: var(--color-danger);
+  min-height: 1.25rem;
+}
+
+/* ===== Juego ===== */
 #game-container {
   background: rgba(255, 255, 255, 0.95);
   padding: 2rem;
@@ -188,6 +238,11 @@ h1 {
   color: white;
 }
 
+.fila-actual {
+  outline: 3px solid var(--color-secondary);
+  background: #fffde7;
+}
+
 .btn {
   background-color: var(--color-primary);
   color: white;
@@ -266,5 +321,9 @@ h1 {
   
   h1 {
     font-size: 1.8rem;
+  }
+
+  .registro-form {
+    grid-template-columns: 1fr;
   }
 }

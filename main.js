@@ -1,7 +1,7 @@
-// Sistema de niveles con progresión de dificultad
+// ===================== Sistema de niveles =====================
 const niveles = [
+  // Nivel 1-5: Fácil
   {
-    // Nivel 1-5: Fácil - Opciones muy obvias
     correcta: "Manzana", 
     opciones: ["Manzana", "Hamburguesa"],
     tiempo: 15,
@@ -31,8 +31,8 @@ const niveles = [
     tiempo: 8,
     explicacion: "La pechuga de pollo es una buena fuente de proteína magra, mientras que los hot dogs contienen procesados y conservantes."
   },
+  // Nivel 6-10: Medio
   {
-    // Nivel 6-10: Medio - Opciones menos obvias
     correcta: "Avena", 
     opciones: ["Avena", "Cereal azucarado"],
     tiempo: 8,
@@ -62,8 +62,8 @@ const niveles = [
     tiempo: 6,
     explicacion: "El salmón es rico en omega-3, mientras que los nuggets suelen ser procesados y fritos."
   },
+  // Nivel 11-15: Difícil
   {
-    // Nivel 11-15: Difícil - Opciones similares
     correcta: "Quinoa", 
     opciones: ["Quinoa", "Arroz blanco"],
     tiempo: 5,
@@ -95,14 +95,17 @@ const niveles = [
   }
 ];
 
+// ===================== Estado del juego =====================
 let nivelActual = 0;
 let tiempoRestante;
 let timer;
 let puntos = 0;
 let vidas = 3;
-let record = localStorage.getItem('record') || 0;
+let record = Number(localStorage.getItem('record') || 0);
+let jugadorActual = null;       // { nombre: string }
+let ultimoJugadorId = null;     // para resaltar su fila en el podio
 
-// Elementos del DOM
+// ===================== DOM =====================
 const nivelSpan = document.getElementById("nivel");
 const tiempoBar = document.getElementById("timer-bar");
 const opcionesDiv = document.getElementById("opciones");
@@ -118,189 +121,275 @@ const finalScoreSpan = document.getElementById("final-score").querySelector("spa
 const recordSpan = document.getElementById("record").querySelector("span");
 const reiniciarBtn = document.getElementById("reiniciar");
 
-// Iniciar juego
-function iniciarJuego() {
-nivelActual = 0;
-puntos = 0;
-vidas = 3;
-actualizarUI();
-gameContent.style.display = "block";
-gameOverScreen.style.display = "none";
-cargarNivel();
-}
+const seccionRegistro = document.getElementById("registro");
+const inputNombre = document.getElementById("nombre-jugador");
+const btnRegistrar = document.getElementById("btn-registrar");
+const registroMsg = document.getElementById("registro-msg");
+const gameContainer = document.getElementById("game-container");
 
-// Cargar nivel
-function cargarNivel() {
-clearInterval(timer);
-const nivel = niveles[nivelActual];
-tiempoRestante = nivel.tiempo;
+// ===================== Registro jugador =====================
+btnRegistrar.addEventListener('click', () => {
+  const nombre = (inputNombre.value || "").trim();
+  if (!nombre) {
+    registroMsg.textContent = "Por favor ingresa tu nombre.";
+    inputNombre.focus();
+    return;
+  }
+  if (nombre.length > 20) {
+    registroMsg.textContent = "Máximo 20 caracteres.";
+    inputNombre.focus();
+    return;
+  }
 
-nivelSpan.textContent = nivelActual + 1;
-tiempoBar.style.width = "100%";
-tiempoBar.style.backgroundColor = "#FF9800";
-feedbackText.textContent = "";
-explicacionDiv.textContent = "";
-siguienteBtn.style.display = "none";
-
-progressBar.style.width = `${(nivelActual / niveles.length) * 100}%`;
-
-opcionesDiv.innerHTML = "";
-nivel.opciones.forEach(opcion => {
-  const btn = document.createElement("div");
-  btn.textContent = opcion;
-  btn.classList.add("opcion");
-  btn.onclick = () => verificarRespuesta(opcion, btn);
-  opcionesDiv.appendChild(btn);
+  jugadorActual = { nombre };
+  ultimoJugadorId = null;
+  seccionRegistro.style.display = 'none';
+  gameContainer.style.display = 'block';
+  iniciarJuego();
 });
 
-timer = setInterval(() => {
-  tiempoRestante -= 0.1;
-  tiempoBar.style.width = `${(tiempoRestante / nivel.tiempo) * 100}%`;
+inputNombre.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') btnRegistrar.click();
+});
 
-  if (tiempoRestante <= nivel.tiempo * 0.3) {
-    tiempoBar.style.backgroundColor = "#F44336";
-  }
+// ===================== Juego =====================
+function iniciarJuego() {
+  nivelActual = 0;
+  puntos = 0;
+  vidas = 3;
+  actualizarUI();
+  gameContent.style.display = "block";
+  gameOverScreen.style.display = "none";
+  document.querySelector('#game-over h2').textContent = "¡Juego Terminado!";
+  cargarNivel();
+}
 
-  if (tiempoRestante <= 0) {
-    clearInterval(timer);
-    tiempoAgotado();
-  }
-}, 100);
+function cargarNivel() {
+  clearInterval(timer);
+  const nivel = niveles[nivelActual];
+  tiempoRestante = nivel.tiempo;
+
+  nivelSpan.textContent = nivelActual + 1;
+  tiempoBar.style.width = "100%";
+  tiempoBar.style.backgroundColor = "#FF9800";
+  feedbackText.textContent = "";
+  explicacionDiv.textContent = "";
+  siguienteBtn.style.display = "none";
+
+  progressBar.style.width = `${(nivelActual / niveles.length) * 100}%`;
+
+  opcionesDiv.innerHTML = "";
+  nivel.opciones.forEach(opcion => {
+    const btn = document.createElement("div");
+    btn.textContent = opcion;
+    btn.classList.add("opcion");
+    btn.onclick = () => verificarRespuesta(opcion, btn);
+    opcionesDiv.appendChild(btn);
+  });
+
+  timer = setInterval(() => {
+    tiempoRestante -= 0.1;
+    tiempoBar.style.width = `${(tiempoRestante / nivel.tiempo) * 100}%`;
+
+    if (tiempoRestante <= nivel.tiempo * 0.3) {
+      tiempoBar.style.backgroundColor = "#F44336";
+    }
+
+    if (tiempoRestante <= 0) {
+      clearInterval(timer);
+      tiempoAgotado();
+    }
+  }, 100);
 }
 
 function verificarRespuesta(opcion, elemento) {
-clearInterval(timer);
-const nivel = niveles[nivelActual];
-
-document.querySelectorAll('.opcion').forEach(btn => {
-  btn.style.pointerEvents = 'none';
-});
-
-if (opcion === nivel.correcta) {
-  elemento.classList.add("correcta");
-  feedbackText.textContent = "✅ ¡Correcto!";
-  puntos += Math.floor(tiempoRestante * 10);
-  actualizarUI();
-} else {
-  elemento.classList.add("incorrecta");
-  feedbackText.textContent = "❌ Incorrecto";
-  vidas--;
-  actualizarUI();
+  clearInterval(timer);
+  const nivel = niveles[nivelActual];
 
   document.querySelectorAll('.opcion').forEach(btn => {
-    if (btn.textContent === nivel.correcta) {
-      btn.classList.add("correcta");
-    }
+    btn.style.pointerEvents = 'none';
   });
 
-  if (vidas <= 0) {
-    finDelJuego();
-    return;
-  }
-}
+  if (opcion === nivel.correcta) {
+    elemento.classList.add("correcta");
+    feedbackText.textContent = "✅ ¡Correcto!";
+    puntos += Math.floor(tiempoRestante * 10);
+    actualizarUI();
+  } else {
+    elemento.classList.add("incorrecta");
+    feedbackText.textContent = "❌ Incorrecto";
+    vidas--;
+    actualizarUI();
 
-explicacionDiv.textContent = nivel.explicacion;
-siguienteBtn.style.display = "block";
+    document.querySelectorAll('.opcion').forEach(btn => {
+      if (btn.textContent === nivel.correcta) btn.classList.add("correcta");
+    });
+
+    if (vidas <= 0) {
+      finDelJuego();
+      return;
+    }
+  }
+
+  explicacionDiv.textContent = nivel.explicacion;
+  siguienteBtn.style.display = "block";
 }
 
 function tiempoAgotado() {
-feedbackText.textContent = "⏰ ¡Tiempo agotado!";
-vidas--;
-actualizarUI();
+  feedbackText.textContent = "⏰ ¡Tiempo agotado!";
+  vidas--;
+  actualizarUI();
 
-const nivel = niveles[nivelActual];
-document.querySelectorAll('.opcion').forEach(btn => {
-  if (btn.textContent === nivel.correcta) {
-    btn.classList.add("correcta");
+  const nivel = niveles[nivelActual];
+  document.querySelectorAll('.opcion').forEach(btn => {
+    if (btn.textContent === nivel.correcta) btn.classList.add("correcta");
+    btn.style.pointerEvents = 'none';
+  });
+
+  explicacionDiv.textContent = nivel.explicacion;
+
+  if (vidas <= 0) {
+    finDelJuego();
+  } else {
+    siguienteBtn.style.display = "block";
   }
-  btn.style.pointerEvents = 'none';
-});
-
-explicacionDiv.textContent = nivel.explicacion;
-
-if (vidas <= 0) {
-  finDelJuego();
-} else {
-  siguienteBtn.style.display = "block";
-}
 }
 
 siguienteBtn.onclick = () => {
-nivelActual++;
-if (nivelActual < niveles.length) {
-  cargarNivel();
-} else {
-  juegoCompletado();
-}
+  nivelActual++;
+  if (nivelActual < niveles.length) {
+    cargarNivel();
+  } else {
+    juegoCompletado();
+  }
 };
 
-// Mostrar podio de jugadores
-async function mostrarPodio() {
-try {
-  const response = await fetch('/api/podio');
-  const data = await response.json();
-  
-  if (data.success) {
-    const tabla = document.querySelector('#tabla-podio tbody');
-    tabla.innerHTML = '';
-    
-    data.podio.forEach(jugador => {
-      const fila = document.createElement('tr');
-      fila.innerHTML = `
-        <td>${jugador.posicion}</td>
-        <td>${jugador.nombre}</td>
-        <td>${jugador.puntaje}</td>
-      `;
-      tabla.appendChild(fila);
-    });
-  }
-} catch (error) {
-  console.error('Error al obtener el podio:', error);
-}
-}
-
 function finDelJuego() {
-gameContent.style.display = "none";
-gameOverScreen.style.display = "block";
-finalScoreSpan.textContent = puntos;
+  gameContent.style.display = "none";
+  gameOverScreen.style.display = "block";
+  finalScoreSpan.textContent = puntos;
 
-if (puntos > record) {
-  record = puntos;
-  localStorage.setItem('record', record);
-}
-recordSpan.textContent = record;
+  if (puntos > record) {
+    record = puntos;
+    localStorage.setItem('record', String(record));
+  }
+  recordSpan.textContent = record;
 
-mostrarPodio();
+  // Guardar en podio y mostrar
+  const pos = registrarEnPodio(jugadorActual?.nombre || "Jugador", puntos);
+  mostrarPodio(pos);
 }
 
 function juegoCompletado() {
-puntos += 1000;
-actualizarUI();
+  puntos += 1000;
+  actualizarUI();
 
-gameContent.style.display = "none";
-gameOverScreen.style.display = "block";
-finalScoreSpan.textContent = puntos;
+  gameContent.style.display = "none";
+  gameOverScreen.style.display = "block";
+  finalScoreSpan.textContent = puntos;
 
-if (puntos > record) {
-  record = puntos;
-  localStorage.setItem('record', record);
-}
-recordSpan.textContent = record;
+  if (puntos > record) {
+    record = puntos;
+    localStorage.setItem('record', String(record));
+  }
+  recordSpan.textContent = record;
 
-document.querySelector('#game-over h2').textContent = "🎉 ¡Felicidades! Has completado el juego";
-mostrarPodio();
+  document.querySelector('#game-over h2').textContent = "🎉 ¡Felicidades! Has completado el juego";
+  const pos = registrarEnPodio(jugadorActual?.nombre || "Jugador", puntos);
+  mostrarPodio(pos);
 }
 
 function actualizarUI() {
-puntosSpan.textContent = puntos;
+  puntosSpan.textContent = puntos;
 
-let vidasHTML = "";
-for (let i = 0; i < 3; i++) {
-  vidasHTML += i < vidas ? "❤️" : "♡";
-}
-vidasDiv.innerHTML = vidasHTML;
+  let vidasHTML = "";
+  for (let i = 0; i < 3; i++) {
+    vidasHTML += i < vidas ? "❤️" : "♡";
+  }
+  vidasDiv.innerHTML = vidasHTML;
 }
 
 reiniciarBtn.onclick = iniciarJuego;
 
-document.addEventListener('DOMContentLoaded', iniciarJuego);
+document.addEventListener('DOMContentLoaded', () => {
+  // si quieres permitir continuar con último jugador automáticamente:
+  // const ultimo = localStorage.getItem('ultimoJugadorNombre');
+  // if (ultimo) { jugadorActual = { nombre: ultimo }; seccionRegistro.style.display='none'; gameContainer.style.display='block'; iniciarJuego(); }
+});
+
+// ===================== Podio (localStorage) =====================
+// Estructura: [{id, nombre, puntaje, fecha}]
+const KEY_PODIO = 'podioJugadores';
+
+function getPodio() {
+  try {
+    const raw = localStorage.getItem(KEY_PODIO);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function savePodio(lista) {
+  localStorage.setItem(KEY_PODIO, JSON.stringify(lista));
+}
+
+// Devuelve la posición (1-based) del registro recién guardado
+function registrarEnPodio(nombre, puntaje) {
+  const id = Date.now() + Math.random().toString(16).slice(2);
+  const entrada = { id, nombre, puntaje, fecha: new Date().toISOString() };
+
+  let podio = getPodio();
+  podio.push(entrada);
+
+  // Orden: mayor puntaje primero; si empatan, más antiguo primero
+  podio.sort((a, b) => {
+    if (b.puntaje !== a.puntaje) return b.puntaje - a.puntaje;
+    return new Date(a.fecha) - new Date(b.fecha);
+  });
+
+  savePodio(podio);
+  ultimoJugadorId = id;
+
+  // calcular posición
+  const index = podio.findIndex(p => p.id === id);
+  // guardar último jugador por comodidad (opcional)
+  localStorage.setItem('ultimoJugadorNombre', nombre);
+
+  return index >= 0 ? index + 1 : null;
+}
+
+function mostrarPodio(posicionActual = null) {
+  const podio = getPodio();
+
+  const tbody = document.querySelector('#tabla-podio tbody');
+  tbody.innerHTML = '';
+
+  podio.forEach((jugador, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${idx + 1}</td>
+      <td>${escapeHTML(jugador.nombre)}</td>
+      <td>${jugador.puntaje}</td>
+    `;
+
+    if (jugador.id === ultimoJugadorId) {
+      tr.classList.add('fila-actual');
+    }
+
+    tbody.appendChild(tr);
+  });
+
+  // Si quieres limitar a top 10 en la vista:
+  // while (tbody.rows.length > 10) tbody.deleteRow(10);
+}
+
+// Utilidad para evitar inyección en nombre
+function escapeHTML(str) {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}

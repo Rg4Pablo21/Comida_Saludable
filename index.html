@@ -8,7 +8,19 @@
 </head>
 <body>
   <div class="background-animation"></div>
-  <div id="game-container">
+
+  <!-- Registro de jugador -->
+  <section id="registro" class="registro">
+    <h1>🍏 Elige lo Saludable</h1>
+    <p class="registro-desc">Ingresa tu nombre para jugar y aparecer en el podio.</p>
+    <div class="registro-form">
+      <input id="nombre-jugador" type="text" placeholder="Tu nombre" maxlength="20" />
+      <button id="btn-registrar" class="btn">Empezar</button>
+    </div>
+    <small id="registro-msg" class="registro-msg"></small>
+  </section>
+
+  <div id="game-container" style="display:none;">
     <div id="header">
       <div id="vidas">❤️❤️❤️</div>
       <div id="puntos">Puntos: <span>0</span></div>
